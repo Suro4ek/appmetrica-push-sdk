@@ -8,21 +8,14 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
-import {
-  useAppMetricaPush,
-  initializeAppMetricaPush,
-  isNotificationFromAppMetrica,
-  getPushSDKInfo,
-  isSDKInitialized,
-} from "../src";
+import { AppMetricaPush } from "../src";
 
 /**
- * Базовый пример использования AppMetrica Push SDK
+ * Краткий пример использования AppMetrica Push SDK
  */
 export const BasicExample: React.FC = () => {
-  const { sdkInfo, isInitialized, isLoading, refreshSDKInfo } =
-    useAppMetricaPush();
-
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [sdkInfo, setSdkInfo] = useState<any>(null);
   const [logs, setLogs] = useState<string[]>([]);
 
   const addLog = (message: string) => {
@@ -33,124 +26,107 @@ export const BasicExample: React.FC = () => {
   };
 
   useEffect(() => {
-    addLog(`Component mounted on ${Platform.OS}`);
-    refreshSDKInfo();
-  }, [refreshSDKInfo]);
+    addLog(`App started on ${Platform.OS}`);
+    checkSDKStatus();
+  }, []);
+
+  const checkSDKStatus = async () => {
+    try {
+      const info = await AppMetricaPush.getSDKInfo();
+      setSdkInfo(info);
+      setIsInitialized(true);
+      addLog("SDK is ready");
+    } catch (error) {
+      addLog(`SDK not ready: ${error}`);
+    }
+  };
 
   const handleInitialize = async () => {
     try {
       addLog("Initializing AppMetrica Push SDK...");
-      const success = await initializeAppMetricaPush({
-        debugMode: true,
+      const result = await AppMetricaPush.initialize({
+        debugMode: __DEV__,
       });
 
-      if (success) {
-        addLog("SDK initialized successfully");
+      if (result.success) {
+        addLog("✅ SDK initialized successfully");
+        setIsInitialized(true);
+        await checkSDKStatus();
       } else {
-        addLog("Failed to initialize SDK");
+        addLog(`❌ Failed to initialize: ${result.error}`);
       }
     } catch (error) {
-      addLog(`Error: ${error}`);
+      addLog(`❌ Error: ${error}`);
     }
   };
 
-  const handleTestNotificationCheck = async () => {
+  const handleTestNotification = async () => {
     try {
-      addLog("Testing notification check...");
+      addLog("Testing notification detection...");
 
       // Тестовое уведомление от AppMetrica
-      const appMetricaNotification = {
+      const testNotification = {
         data: {
-          ym_push_id: "test_push_id",
-          ym_campaign_id: "test_campaign",
-          ym_message_id: "test_message",
+          ym_push_id: "test_123",
+          ym_campaign_id: "campaign_456",
         },
       };
 
-      // Обычное уведомление
-      const regularNotification = {
-        data: {
-          title: "Regular notification",
-          body: "This is not from AppMetrica",
-        },
-      };
+      const isFromAppMetrica =
+        await AppMetricaPush.isNotificationFromAppMetrica(testNotification);
 
-      const isAppMetrica1 = await isNotificationFromAppMetrica(
-        appMetricaNotification
-      );
-      const isAppMetrica2 = await isNotificationFromAppMetrica(
-        regularNotification
+      addLog(
+        `Notification from AppMetrica: ${isFromAppMetrica ? "✅ Yes" : "❌ No"}`
       );
 
-      addLog(`AppMetrica notification detected: ${isAppMetrica1}`);
-      addLog(`Regular notification detected: ${isAppMetrica2}`);
+      if (isFromAppMetrica) {
+        const userData = await AppMetricaPush.getUserData(testNotification);
+        addLog(`User data: ${JSON.stringify(userData)}`);
+      }
     } catch (error) {
-      addLog(`Error testing notification: ${error}`);
+      addLog(`❌ Error testing notification: ${error}`);
     }
   };
 
-  const handleTestSDKInfo = async () => {
+  const handleGetSDKInfo = async () => {
     try {
-      addLog("Testing SDK info...");
-      const info = await getPushSDKInfo();
-      addLog(`SDK Info: ${JSON.stringify(info)}`);
+      const info = await AppMetricaPush.getSDKInfo();
+      setSdkInfo(info);
+      addLog(`SDK Info: ${JSON.stringify(info, null, 2)}`);
     } catch (error) {
-      addLog(`Error getting SDK info: ${error}`);
+      addLog(`❌ Error getting SDK info: ${error}`);
     }
   };
 
-  const handleRefresh = async () => {
-    addLog("Refreshing SDK info...");
-    await refreshSDKInfo();
-    addLog("SDK info refreshed");
-  };
-
-  const clearLogs = () => {
-    setLogs([]);
-  };
+  const clearLogs = () => setLogs([]);
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>AppMetrica Push SDK Example</Text>
+      <Text style={styles.title}>AppMetrica Push SDK</Text>
 
-      <View style={styles.statusContainer}>
-        <Text style={styles.statusLabel}>Platform:</Text>
-        <Text style={[styles.statusValue, { color: "#2196F3" }]}>
-          {Platform.OS}
+      <View style={styles.statusCard}>
+        <Text style={styles.statusText}>
+          Platform: <Text style={styles.highlight}>{Platform.OS}</Text>
         </Text>
-      </View>
-
-      <View style={styles.statusContainer}>
-        <Text style={styles.statusLabel}>Initialized:</Text>
-        <Text
-          style={[
-            styles.statusValue,
-            { color: isInitialized ? "#4CAF50" : "#F44336" },
-          ]}
-        >
-          {isInitialized ? "Yes" : "No"}
+        <Text style={styles.statusText}>
+          Status:{" "}
+          <Text
+            style={[
+              styles.highlight,
+              {
+                color: isInitialized ? "#4CAF50" : "#F44336",
+              },
+            ]}
+          >
+            {isInitialized ? "Ready" : "Not initialized"}
+          </Text>
         </Text>
+        {sdkInfo && (
+          <Text style={styles.statusText}>
+            Version: <Text style={styles.highlight}>{sdkInfo.version}</Text>
+          </Text>
+        )}
       </View>
-
-      <View style={styles.statusContainer}>
-        <Text style={styles.statusLabel}>Loading:</Text>
-        <Text
-          style={[
-            styles.statusValue,
-            { color: isLoading ? "#FF9800" : "#4CAF50" },
-          ]}
-        >
-          {isLoading ? "Yes" : "No"}
-        </Text>
-      </View>
-
-      {sdkInfo && (
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoLabel}>SDK Info:</Text>
-          <Text style={styles.infoText}>Version: {sdkInfo.version}</Text>
-          <Text style={styles.infoText}>Platform: {sdkInfo.platform}</Text>
-        </View>
-      )}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -162,23 +138,16 @@ export const BasicExample: React.FC = () => {
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
-          onPress={handleTestNotificationCheck}
+          onPress={handleTestNotification}
         >
-          <Text style={styles.buttonText}>Test Notification Check</Text>
+          <Text style={styles.buttonText}>Test Notification</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.button, styles.tertiaryButton]}
-          onPress={handleTestSDKInfo}
+          onPress={handleGetSDKInfo}
         >
-          <Text style={styles.buttonText}>Test SDK Info</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.quaternaryButton]}
-          onPress={handleRefresh}
-        >
-          <Text style={styles.buttonText}>Refresh</Text>
+          <Text style={styles.buttonText}>Get SDK Info</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -214,44 +183,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: "#333",
   },
-  statusContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 8,
-  },
-  statusLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginRight: 10,
-    color: "#666",
-    minWidth: 100,
-  },
-  statusValue: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  infoContainer: {
+  statusCard: {
     backgroundColor: "#fff",
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  infoLabel: {
+  statusText: {
     fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 10,
-    color: "#333",
-  },
-  infoText: {
-    fontSize: 14,
+    marginBottom: 8,
     color: "#666",
-    marginBottom: 5,
+  },
+  highlight: {
+    fontWeight: "bold",
+    color: "#2196F3",
   },
   buttonContainer: {
-    gap: 10,
+    gap: 12,
     marginBottom: 20,
   },
   button: {
@@ -267,9 +220,6 @@ const styles = StyleSheet.create({
   },
   tertiaryButton: {
     backgroundColor: "#FF9800",
-  },
-  quaternaryButton: {
-    backgroundColor: "#9C27B0",
   },
   dangerButton: {
     backgroundColor: "#F44336",
@@ -294,7 +244,7 @@ const styles = StyleSheet.create({
   logText: {
     fontSize: 12,
     color: "#666",
-    marginBottom: 5,
+    marginBottom: 4,
     fontFamily: "monospace",
   },
 });
