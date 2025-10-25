@@ -1,106 +1,78 @@
 import Foundation
 import React
-import YandexMobileMetricaPush
+import AppMetricaPush
 
 @objc(AppMetricaPushModule)
-class AppMetricaPushModule: RCTEventEmitter {
+class AppMetricaPushModule: NSObject, RCTBridgeModule {
     
-    override static func requiresMainQueueSetup() -> Bool {
+    // MARK: - RCTBridgeModule Protocol
+    
+    static func requiresMainQueueSetup() -> Bool {
         return false
     }
     
-    override func supportedEvents() -> [String]! {
-        return ["PushTokenReceived", "PushMessageReceived", "PushOpened", "PushClicked"]
+    static func moduleName() -> String! {
+        return "AppMetricaPushModule"
     }
+    
+    // MARK: - Initialization (Deprecated - use AppMetricaPushInitializer)
     
     @objc
     func initialize(_ config: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        guard let apiKey = config["apiKey"] as? String else {
-            rejecter("INVALID_CONFIG", "API key is required", nil)
-            return
-        }
-        
-        let autoTracking = config["autoTracking"] as? Bool ?? true
         let debugMode = config["debugMode"] as? Bool ?? false
         
         DispatchQueue.main.async {
-            // Инициализация YandexMobileMetricaPush
-            YandexMobileMetricaPush.initialize(withApiKey: apiKey)
+            // Инициализация AppMetrica Push SDK теперь происходит в AppMetricaPushInitializer
+            // Этот метод оставлен для обратной совместимости
+            // Основная инициализация должна происходить в AppDelegate.swift
             
             if debugMode {
-                print("AppMetrica Push initialized with API key: \(apiKey)")
+                print("AppMetrica Push SDK ready (initialization handled by AppMetricaPushInitializer)")
             }
             
             resolver(true)
         }
     }
     
+    // MARK: - Notification Analysis
+    
     @objc
-    func getPushToken(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+    func isNotificationFromAppMetrica(_ notification: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
-            if let token = YandexMobileMetricaPush.token() {
-                let result: [String: Any] = [
-                    "token": token,
-                    "platform": "ios"
-                ]
-                resolver(result)
-            } else {
-                resolver(nil)
-            }
+            // Преобразуем NSDictionary в [AnyHashable : Any] для AppMetrica
+            let notificationDict = notification as? [AnyHashable : Any] ?? [:]
+            let isRelatedToAppMetricaSDK = AppMetricaPush.isNotificationRelated(toSDK: notificationDict)
+            resolver(isRelatedToAppMetricaSDK)
         }
     }
     
-    @objc
-    func sendPushToken(_ token: String, options: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        DispatchQueue.main.async {
-            YandexMobileMetricaPush.setToken(token)
-            resolver(true)
-        }
-    }
-    
-    @objc
-    func handlePushMessage(_ message: NSDictionary, options: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        DispatchQueue.main.async {
-            if let messageId = message["messageId"] as? String {
-                // Отправляем событие в AppMetrica
-                YandexMobileMetricaPush.reportPushMessage(messageId)
-            }
-            resolver(true)
-        }
-    }
-    
-    @objc
-    func reportPushOpen(_ messageId: String, action: String?, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        DispatchQueue.main.async {
-            YandexMobileMetricaPush.reportPushOpen(messageId, action: action)
-            resolver(true)
-        }
-    }
-    
-    @objc
-    func reportPushClick(_ messageId: String, action: String?, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        DispatchQueue.main.async {
-            YandexMobileMetricaPush.reportPushClick(messageId, action: action)
-            resolver(true)
-        }
-    }
-    
-    @objc
-    func isPushAvailable(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
-        DispatchQueue.main.async {
-            let available = YandexMobileMetricaPush.isPushAvailable()
-            resolver(available)
-        }
-    }
+    // MARK: - SDK Information
     
     @objc
     func getSDKInfo(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             let info: [String: Any] = [
                 "version": "3.2.0",
-                "platform": "ios"
+                "platform": "ios",
+                "sdkName": "AppMetrica Push SDK",
+                "libraryVersion": "1.0.0"
             ]
             resolver(info)
         }
     }
+    
+    // MARK: - User Data Extraction
+    
+    @objc
+    func getUserData(_ notification: NSDictionary, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            // Преобразуем NSDictionary в [AnyHashable : Any] для AppMetrica
+            let notificationDict = notification as? [AnyHashable : Any] ?? [:]
+            // Получаем дополнительную информацию из push-уведомления согласно документации
+            let userData = AppMetricaPush.userData(forNotification: notificationDict)
+            resolver(userData)
+        }
+    }
+    
 }
+

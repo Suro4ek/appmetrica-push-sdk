@@ -52,7 +52,9 @@
       "packageImportPath": "import com.appmetricapush.AppMetricaPushPackage;"
     },
     "ios": {
-      "project": "ios/AppMetricaPushSDK.xcodeproj"
+      "sharedLibraries": [
+        "libc++"
+      ]
     }
   },
   "files": [

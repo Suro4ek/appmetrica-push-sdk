@@ -1,137 +1,146 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native'
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  ScrollView,
+  Platform,
+} from "react-native";
 import {
   useAppMetricaPush,
-  AppMetricaPush,
   initializeAppMetricaPush,
-  setupPushToken,
-  handleIncomingPush,
-  reportPushClick,
-  PushMessage,
-} from '../src'
+  isNotificationFromAppMetrica,
+  getPushSDKInfo,
+  isSDKInitialized,
+} from "../src";
 
 /**
  * Базовый пример использования AppMetrica Push SDK
  */
 export const BasicExample: React.FC = () => {
-  const {
-    isPushAvailable,
-    sdkInfo,
-    isInitialized,
-    isLoading,
-    handlePush,
-    reportClick,
-    refreshAvailability,
-  } = useAppMetricaPush()
+  const { sdkInfo, isInitialized, isLoading, refreshSDKInfo } =
+    useAppMetricaPush();
 
-  const [logs, setLogs] = useState<string[]>([])
+  const [logs, setLogs] = useState<string[]>([]);
 
   const addLog = (message: string) => {
-    setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`])
-  }
+    setLogs((prev) => [
+      ...prev,
+      `${new Date().toLocaleTimeString()}: ${message}`,
+    ]);
+  };
 
   useEffect(() => {
-    addLog('Component mounted')
-    refreshAvailability()
-  }, [refreshAvailability])
+    addLog(`Component mounted on ${Platform.OS}`);
+    refreshSDKInfo();
+  }, [refreshSDKInfo]);
 
   const handleInitialize = async () => {
     try {
-      addLog('Initializing AppMetrica Push SDK...')
+      addLog("Initializing AppMetrica Push SDK...");
       const success = await initializeAppMetricaPush({
-        apiKey: 'YOUR_API_KEY_HERE',
-        autoTracking: true,
         debugMode: true,
-      })
+      });
 
       if (success) {
-        addLog('SDK initialized successfully')
-        await setupPushToken()
-        addLog('Push token setup completed')
+        addLog("SDK initialized successfully");
       } else {
-        addLog('Failed to initialize SDK')
+        addLog("Failed to initialize SDK");
       }
     } catch (error) {
-      addLog(`Error: ${error}`)
+      addLog(`Error: ${error}`);
     }
-  }
+  };
 
-  const handleTestPush = async () => {
-    const testMessage: PushMessage = {
-      title: 'Тестовое уведомление',
-      body: 'Это тестовое push уведомление от AppMetrica',
-      messageId: `test_${Date.now()}`,
-      data: {
-        type: 'test',
-        timestamp: Date.now(),
-      },
-    }
-
+  const handleTestNotificationCheck = async () => {
     try {
-      addLog('Handling test push message...')
-      const success = await handlePush(testMessage, {
-        autoTrackOpen: true,
-        autoTrackClick: true,
-      })
+      addLog("Testing notification check...");
 
-      if (success) {
-        addLog('Push message handled successfully')
-      } else {
-        addLog('Failed to handle push message')
-      }
+      // Тестовое уведомление от AppMetrica
+      const appMetricaNotification = {
+        data: {
+          ym_push_id: "test_push_id",
+          ym_campaign_id: "test_campaign",
+          ym_message_id: "test_message",
+        },
+      };
+
+      // Обычное уведомление
+      const regularNotification = {
+        data: {
+          title: "Regular notification",
+          body: "This is not from AppMetrica",
+        },
+      };
+
+      const isAppMetrica1 = await isNotificationFromAppMetrica(
+        appMetricaNotification
+      );
+      const isAppMetrica2 = await isNotificationFromAppMetrica(
+        regularNotification
+      );
+
+      addLog(`AppMetrica notification detected: ${isAppMetrica1}`);
+      addLog(`Regular notification detected: ${isAppMetrica2}`);
     } catch (error) {
-      addLog(`Error handling push: ${error}`)
+      addLog(`Error testing notification: ${error}`);
     }
-  }
+  };
 
-  const handleTestClick = async () => {
-    const messageId = `test_${Date.now()}`
+  const handleTestSDKInfo = async () => {
     try {
-      addLog('Reporting push click...')
-      const success = await reportClick(messageId, 'test_action')
-
-      if (success) {
-        addLog('Push click reported successfully')
-      } else {
-        addLog('Failed to report push click')
-      }
+      addLog("Testing SDK info...");
+      const info = await getPushSDKInfo();
+      addLog(`SDK Info: ${JSON.stringify(info)}`);
     } catch (error) {
-      addLog(`Error reporting click: ${error}`)
+      addLog(`Error getting SDK info: ${error}`);
     }
-  }
+  };
 
   const handleRefresh = async () => {
-    addLog('Refreshing availability...')
-    await refreshAvailability()
-    addLog('Availability refreshed')
-  }
+    addLog("Refreshing SDK info...");
+    await refreshSDKInfo();
+    addLog("SDK info refreshed");
+  };
 
   const clearLogs = () => {
-    setLogs([])
-  }
+    setLogs([]);
+  };
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>AppMetrica Push SDK Example</Text>
 
       <View style={styles.statusContainer}>
-        <Text style={styles.statusLabel}>Status:</Text>
-        <Text style={[styles.statusValue, { color: isPushAvailable ? '#4CAF50' : '#F44336' }]}>
-          {isPushAvailable ? 'Available' : 'Not Available'}
+        <Text style={styles.statusLabel}>Platform:</Text>
+        <Text style={[styles.statusValue, { color: "#2196F3" }]}>
+          {Platform.OS}
         </Text>
       </View>
 
       <View style={styles.statusContainer}>
         <Text style={styles.statusLabel}>Initialized:</Text>
-        <Text style={[styles.statusValue, { color: isInitialized ? '#4CAF50' : '#F44336' }]}>
-          {isInitialized ? 'Yes' : 'No'}
+        <Text
+          style={[
+            styles.statusValue,
+            { color: isInitialized ? "#4CAF50" : "#F44336" },
+          ]}
+        >
+          {isInitialized ? "Yes" : "No"}
         </Text>
       </View>
 
       <View style={styles.statusContainer}>
         <Text style={styles.statusLabel}>Loading:</Text>
-        <Text style={[styles.statusValue, { color: isLoading ? '#FF9800' : '#4CAF50' }]}>
-          {isLoading ? 'Yes' : 'No'}
+        <Text
+          style={[
+            styles.statusValue,
+            { color: isLoading ? "#FF9800" : "#4CAF50" },
+          ]}
+        >
+          {isLoading ? "Yes" : "No"}
         </Text>
       </View>
 
@@ -144,23 +153,38 @@ export const BasicExample: React.FC = () => {
       )}
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, styles.primaryButton]} onPress={handleInitialize}>
+        <TouchableOpacity
+          style={[styles.button, styles.primaryButton]}
+          onPress={handleInitialize}
+        >
           <Text style={styles.buttonText}>Initialize SDK</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={handleTestPush}>
-          <Text style={styles.buttonText}>Test Push</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.secondaryButton]}
+          onPress={handleTestNotificationCheck}
+        >
+          <Text style={styles.buttonText}>Test Notification Check</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.tertiaryButton]} onPress={handleTestClick}>
-          <Text style={styles.buttonText}>Test Click</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.tertiaryButton]}
+          onPress={handleTestSDKInfo}
+        >
+          <Text style={styles.buttonText}>Test SDK Info</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.quaternaryButton]} onPress={handleRefresh}>
+        <TouchableOpacity
+          style={[styles.button, styles.quaternaryButton]}
+          onPress={handleRefresh}
+        >
           <Text style={styles.buttonText}>Refresh</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.dangerButton]} onPress={clearLogs}>
+        <TouchableOpacity
+          style={[styles.button, styles.dangerButton]}
+          onPress={clearLogs}
+        >
           <Text style={styles.buttonText}>Clear Logs</Text>
         </TouchableOpacity>
       </View>
@@ -174,56 +198,56 @@ export const BasicExample: React.FC = () => {
         ))}
       </View>
     </ScrollView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 20,
-    color: '#333',
+    color: "#333",
   },
   statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 10,
     borderRadius: 8,
   },
   statusLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginRight: 10,
-    color: '#666',
+    color: "#666",
     minWidth: 100,
   },
   statusValue: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   infoContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
   },
   infoLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   infoText: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 5,
   },
   buttonContainer: {
@@ -233,44 +257,44 @@ const styles = StyleSheet.create({
   button: {
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   primaryButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: "#2196F3",
   },
   secondaryButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
   },
   tertiaryButton: {
-    backgroundColor: '#FF9800',
+    backgroundColor: "#FF9800",
   },
   quaternaryButton: {
-    backgroundColor: '#9C27B0',
+    backgroundColor: "#9C27B0",
   },
   dangerButton: {
-    backgroundColor: '#F44336',
+    backgroundColor: "#F44336",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   logsContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 8,
     maxHeight: 300,
   },
   logsTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   logText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
     marginBottom: 5,
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
   },
-})
+});

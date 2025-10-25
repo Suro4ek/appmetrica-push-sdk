@@ -114,6 +114,34 @@ class AppMetricaPushModule(reactContext: ReactApplicationContext) : ReactContext
         }
     }
 
+    @ReactMethod
+    fun getUserData(notification: ReadableMap, promise: Promise) {
+        try {
+            // Получаем дополнительную информацию из push-уведомления согласно документации
+            // AppMetrica Push SDK автоматически извлекает userData из уведомления
+            val userData = Arguments.createMap()
+            
+            // Проверяем наличие данных в уведомлении
+            if (notification.hasKey("data")) {
+                val data = notification.getMap("data")
+                if (data != null) {
+                    // Копируем все данные из notification.data в userData
+                    val iterator = data.entryIterator
+                    while (iterator.hasNextKey()) {
+                        val key = iterator.nextKey()
+                        val value = data.getDynamic(key)
+                        userData.putDynamic(key, value)
+                    }
+                }
+            }
+            
+            promise.resolve(userData)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get user data from notification", e)
+            promise.reject("USER_DATA_ERROR", e.message)
+        }
+    }
+
     /**
      * Получение версии AppMetrica Push SDK
      */

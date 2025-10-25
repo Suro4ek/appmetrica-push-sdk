@@ -1,254 +1,142 @@
-# Интеграция AppMetrica Push SDK в основной проект
+# AppMetrica Push SDK - Интеграция
 
-## Шаги интеграции
+## 🚀 Быстрая установка
 
-### 1. Установка библиотеки в основной проект
+### 1. Установка библиотеки
 
 ```bash
-# В корне основного проекта
-cd /Users/moseffect21/Documents/work/AlfaProjects/MoykaReactNative
+# Через npm
+npm install @moseffect21/appmetrica-push-sdk@git+https://github.com/moseffect21/appmetrica-push-sdk.git
 
-# Установка локальной библиотеки
-yarn add file:./AppmetricaPushSdk
+# Через yarn
+yarn add @moseffect21/appmetrica-push-sdk@git+https://github.com/moseffect21/appmetrica-push-sdk.git
 ```
 
-### 2. Обновление зависимостей в основном проекте
+### 2. Настройка зависимостей
 
 #### Android (android/app/build.gradle)
-
-**Добавьте следующие зависимости в основной проект:**
 
 ```gradle
 dependencies {
     // Firebase Cloud Messaging
     implementation platform('com.google.firebase:firebase-bom:33.2.0')
     implementation 'com.google.firebase:firebase-messaging'
-    implementation 'com.google.firebase:firebase-messaging-ktx'
 
     // AppMetrica Push SDK
     implementation("io.appmetrica.analytics:push:4.2.1")
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-
-    // AppMetrica Push SDK Firebase integration
     implementation("io.appmetrica.analytics:push-provider-firebase:4.2.1")
 }
 ```
 
-**Важно:** Библиотека `@moyka/appmetrica-push-sdk` использует `compileOnly` для Firebase зависимостей, поэтому они должны быть добавлены в основной проект.
-
-#### iOS (ios/Podfile)
-
-Убедитесь, что у вас есть зависимости:
-
-```ruby
-pod 'AppMetricaPush', '~> 3.2.0'
-pod 'AppMetricaPushLazy', '~> 3.2.0'
-```
-
-Затем выполните:
+#### iOS
 
 ```bash
 cd ios && pod install
 ```
 
-### 3. Настройка AndroidManifest.xml
+## 📱 Настройка нативного кода
 
-#### Добавьте сервисы и ресиверы:
+### iOS (AppDelegate.swift)
 
-```xml
-<application>
-    <!-- Silent Push Receiver для AppMetrica Push SDK -->
-    <receiver android:name="com.moykareactnative.SilentPushReceiver"
-              android:exported="false">
-        <intent-filter>
-            <!-- Получение silent push уведомлений от AppMetrica -->
-            <action android:name="com.moykareactnative.action.ymp.SILENT_PUSH_RECEIVE"/>
-        </intent-filter>
-    </receiver>
+```swift
+import AppMetricaPushSDK
 
-    <!-- Firebase Messaging Service для интеграции с AppMetrica Push SDK -->
-    <service android:name="com.appmetricapush.FirebaseMessagingMainService"
-             android:enabled="true"
-             android:exported="false">
-        <intent-filter android:priority="100">
-            <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-        </intent-filter>
-    </service>
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    // Инициализация AppMetrica Push SDK
+    AppMetricaPushInitializer.initialize(application: application, withLaunchOptions: launchOptions)
 
-    <!-- Отключаем стандартный AppMetrica Messaging Service -->
-    <service android:name="io.appmetrica.analytics.push.provider.firebase.AppMetricaMessagingService"
-             tools:node="remove"/>
-
-    <!-- Иконка уведомлений по умолчанию для AppMetrica Push SDK -->
-    <meta-data android:name="io.appmetrica.analytics.push.default_notification_icon"
-               android:resource="@drawable/ic_stat_notification"/>
-</application>
-```
-
-**Примечание:** Подробная настройка silent push описана в [SILENT_PUSH_SETUP.md](./SILENT_PUSH_SETUP.md).
-
-### 4. Интеграция в код
-
-#### Обновление существующего файла yandexMetrikaPush.native.ts
-
-```typescript
-import { initializeAppMetricaPush, isNotificationFromAppMetrica } from '@moyka/appmetrica-push-sdk'
-import { User } from '@domain/entity/user/User'
-
-/**
- * Инициализация AppMetrica Push SDK
- */
-export const initializeAppMetricaPushSDK = async (): Promise<boolean> => {
-  try {
-    const success = await initializeAppMetricaPush({
-      debugMode: __DEV__,
-    })
-
-    if (success) {
-      console.log('AppMetrica Push SDK initialized successfully')
-    }
-
-    return success
-  } catch (error) {
-    console.error('Failed to initialize AppMetrica Push SDK:', error)
-    return false
-  }
+    return true
 }
 
-/**
- * Проверка, что push уведомление от AppMetrica
- * Используется в собственных сервисах обработки push уведомлений
- */
-export const checkIfNotificationFromAppMetrica = async (notification: any): Promise<boolean> => {
-  try {
-    const isFromAppMetrica = await isNotificationFromAppMetrica(notification)
-
-    if (isFromAppMetrica) {
-      console.log('Notification is from AppMetrica, skipping custom processing')
-    }
-
-    return isFromAppMetrica
-  } catch (error) {
-    console.error('Failed to check if notification is from AppMetrica:', error)
-    return false
-  }
+func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    // Регистрация device token
+    AppMetricaPushInitializer.registerDeviceToken(deviceToken)
 }
 ```
 
-### 5. Использование в компонентах
+### Android
 
-#### React Hook useAppMetricaPush
+**Инициализация происходит автоматически через React Native модуль при вызове `AppMetricaPush.initialize()` в JavaScript коде.**
 
-```typescript
-import { useAppMetricaPush } from '@moyka/appmetrica-push-sdk'
-import React from 'react'
-import { View, Text } from 'react-native'
-
-export const MyComponent: React.FC = () => {
-  const { sdkInfo, isInitialized, isLoading } = useAppMetricaPush()
-
-  if (isLoading) {
-    return <Text>Loading...</Text>
-  }
-
-  return (
-    <View>
-      <Text>SDK Initialized: {isInitialized ? 'Yes' : 'No'}</Text>
-      {sdkInfo && (
-        <Text>Version: {sdkInfo.version}</Text>
-      )}
-    </View>
-  )
-}
-```
-
-### 6. Особенности библиотеки
-
-#### Автоматическая настройка звука уведомлений
-
-Библиотека автоматически настраивает каналы уведомлений для Android 8.0+:
-
-- ✅ **Высокий приоритет** - `IMPORTANCE_HIGH`
-- ✅ **Звук включен** - дефолтный рингтон уведомлений
-- ✅ **Вибрация включена** - для лучшего UX
-- ✅ **Светодиод включен** - для визуального уведомления
-
-#### FirebaseMessagingMainService
-
-Библиотека включает готовый `FirebaseMessagingMainService`:
-
-- ✅ **Автоматическая обработка** - AppMetrica Push SDK сам показывает уведомления
-- ✅ **Правильная интеграция** - с Firebase Cloud Messaging
-- ✅ **Аналитика** - автоматическое отслеживание событий
-
-### 7. API библиотеки
-
-#### Основные функции:
+## 💻 Использование в React Native
 
 ```typescript
-// Инициализация
-await initializeAppMetricaPush({ debugMode: __DEV__ })
+import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
 
-// Проверка источника уведомления
-const isFromAppMetrica = await isNotificationFromAppMetrica(notification)
+// Инициализация (обязательно для Android, опционально для iOS)
+await AppMetricaPush.initialize({
+  debugMode: __DEV__,
+});
+
+// Проверка уведомления
+const isFromAppMetrica = await AppMetricaPush.isNotificationFromAppMetrica(
+  notification
+);
 
 // Получение информации о SDK
-const sdkInfo = await getPushSDKInfo()
+const sdkInfo = await AppMetricaPush.getSDKInfo();
 
-// Проверка инициализации
-const isInitialized = isSDKInitialized()
+// Извлечение пользовательских данных
+const userData = await AppMetricaPush.getUserData(notification);
 ```
 
-#### React Hook:
+### Различия между платформами
 
-```typescript
-const { sdkInfo, isInitialized, isLoading, refreshSDKInfo } = useAppMetricaPush()
+- **iOS**: Инициализация происходит в `AppDelegate.swift` через `AppMetricaPushInitializer`
+- **Android**: Инициализация происходит через React Native модуль при вызове `AppMetricaPush.initialize()`
+
+## 🔧 Дополнительные настройки
+
+### Настройка Firebase (Android)
+
+1. Добавьте `google-services.json` в `android/app/`
+2. Включите Firebase в `android/app/build.gradle`:
+
+```gradle
+apply plugin: 'com.google.gms.google-services'
 ```
 
-### 8. Отладка
+### Настройка APNs (iOS)
 
-#### Логи в Android Studio:
+1. Включите Push Notifications в Xcode
+2. Настройте сертификаты в Apple Developer Console
 
-```
-AppMetricaPush: AppMetrica Push initialized successfully
-AppMetricaPush: AppMetrica default notification channel configured with sound
-AppMetricaFirebaseService: Firebase message received: [messageId]
-AppMetricaFirebaseService: Processing AppMetrica push notification
-```
+## 📚 API Reference
 
-#### Проверка работы:
+### Основные методы
 
-1. **Инициализация** - проверьте логи при запуске приложения
-2. **Каналы уведомлений** - в настройках Android должны появиться каналы
-3. **Тестовые уведомления** - используйте веб-интерфейс AppMetrica
+- `initialize(config)` - Инициализация SDK
+- `isNotificationFromAppMetrica(notification)` - Проверка уведомления
+- `getSDKInfo()` - Информация о SDK
+- `getUserData(notification)` - Пользовательские данные
 
-### 9. Troubleshooting
+### Утилиты
 
-#### Уведомления без звука:
+- `initializeAppMetricaPush(config)` - Инициализация с проверками
+- `isSDKInitialized()` - Проверка инициализации
+- `getCurrentConfig()` - Текущая конфигурация
 
-1. ✅ Проверьте, что библиотека инициализирована
-2. ✅ Убедитесь, что добавлены Firebase зависимости
-3. ✅ Проверьте настройки каналов в Android
-4. ✅ Убедитесь, что приложение не в режиме "Не беспокоить"
+## 🐛 Troubleshooting
 
-#### Ошибки компиляции:
+### Частые проблемы
 
-1. ✅ Убедитесь, что добавлены все зависимости в основной проект
-2. ✅ Проверьте, что библиотека переустановлена после изменений
-3. ✅ Очистите кэш: `cd android && ./gradlew clean`
+1. **"AppMetricaPushModule is not available"**
 
-### 10. Версии
+   - Проверьте, что библиотека правильно установлена
+   - Выполните `cd ios && pod install` (iOS)
+   - Пересоберите проект
 
-- **AppMetrica Push SDK**: 4.2.1
-- **Firebase BOM**: 33.2.0
-- **Kotlin**: 2.1.20
-- **React Native**: >=0.60.0
+2. **Push-уведомления не приходят**
 
-## Дополнительные руководства
+   - Проверьте настройки Firebase/APNs
+   - Убедитесь, что device token регистрируется
+   - Проверьте логи в консоли
 
-- [SILENT_PUSH_SETUP.md](./SILENT_PUSH_SETUP.md) - настройка silent push уведомлений
-- [ANALYTICS_GUIDE.md](./ANALYTICS_GUIDE.md) - руководство для аналитиков
+3. **Ошибки компиляции**
+   - Очистите кэш: `npx react-native start --reset-cache`
+   - Пересоберите проект полностью
 
----
+## 📞 Поддержка
 
-**Библиотека готова к использованию!** 🎉
+- GitHub: [moseffect21/appmetrica-push-sdk](https://github.com/moseffect21/appmetrica-push-sdk)
+- Документация: [AppMetrica Push SDK](https://appmetrica.yandex.ru/docs/mobile-sdk-dg/push-sdk/about.html)
