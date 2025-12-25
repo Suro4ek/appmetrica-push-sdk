@@ -1,4 +1,4 @@
-## 📦 @moseffect21/appmetrica-push-sdk v{{version}}
+## 📦 @suro4ek/appmetrica-push-sdk v{{version}}
 
 ### 🚀 Что нового
 
@@ -9,9 +9,9 @@
 ### 📥 Установка
 
 ```bash
-npm install @moseffect21/appmetrica-push-sdk@{{version}}
+npm install @suro4ek/appmetrica-push-sdk@{{version}}
 # или
-yarn add @moseffect21/appmetrica-push-sdk@{{version}}
+yarn add @suro4ek/appmetrica-push-sdk@{{version}}
 ```
 
 ### 📚 Документация
@@ -22,8 +22,8 @@ yarn add @moseffect21/appmetrica-push-sdk@{{version}}
 
 ### 🔗 Ссылки
 
-- [npm package](https://www.npmjs.com/package/@moseffect21/appmetrica-push-sdk)
-- [GitHub repository](https://github.com/moseffect21/appmetrica-push-sdk)
+- [npm package](https://www.npmjs.com/package/@suro4ek/appmetrica-push-sdk)
+- [GitHub repository](https://github.com/suro4ek/appmetrica-push-sdk)
 
 ### 🐛 Исправления
 

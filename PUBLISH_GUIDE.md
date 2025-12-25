@@ -6,7 +6,7 @@
 
 Убедитесь, что в `package.json` правильно настроены:
 
-- `name`: `@moseffect21/appmetrica-push-sdk`
+- `name`: `@suro4ek/appmetrica-push-sdk`
 - `version`: актуальная версия
 - `main`: `src/index.ts`
 - `types`: `src/index.ts`
@@ -114,7 +114,7 @@ npm pack --dry-run
 
 # Проверка, что пакет можно установить
 npm pack
-tar -tzf moseffect21-appmetrica-push-sdk-1.0.0.tgz
+tar -tzf suro4ek-appmetrica-push-sdk-1.0.0.tgz
 ```
 
 #### 3. Публикация
@@ -130,10 +130,10 @@ npm publish --access public
 
 ```bash
 # Проверка, что пакет опубликован
-npm view @moseffect21/appmetrica-push-sdk
+npm view @suro4ek/appmetrica-push-sdk
 
 # Тестовая установка
-npm install @moseffect21/appmetrica-push-sdk@latest
+npm install @suro4ek/appmetrica-push-sdk@latest
 ```
 
 ## Обновление версии
@@ -172,13 +172,13 @@ git push origin "vX.X.X"
 
 ```bash
 # Через npm
-npm install @moseffect21/appmetrica-push-sdk
+npm install @suro4ek/appmetrica-push-sdk
 
 # Через yarn
-yarn add @moseffect21/appmetrica-push-sdk
+yarn add @suro4ek/appmetrica-push-sdk
 
 # Через pnpm
-pnpm add @moseffect21/appmetrica-push-sdk
+pnpm add @suro4ek/appmetrica-push-sdk
 ```
 
 ## Troubleshooting
@@ -193,7 +193,7 @@ pnpm add @moseffect21/appmetrica-push-sdk
 ### Ошибка "You do not have permission"
 
 1. Убедитесь, что вы авторизованы: `npm whoami`
-2. Проверьте, что у вас есть права на публикацию в scope `@moseffect21`
+2. Проверьте, что у вас есть права на публикацию в scope `@suro4ek`
 
 ### Ошибка "Invalid package name"
 
@@ -213,8 +213,8 @@ pnpm add @moseffect21/appmetrica-push-sdk
 
 ### Просмотр релизов
 
-- **GitHub Releases**: https://github.com/moseffect21/appmetrica-push-sdk/releases
-- **npm package**: https://www.npmjs.com/package/@moseffect21/appmetrica-push-sdk
+- **GitHub Releases**: https://github.com/suro4ek/appmetrica-push-sdk/releases
+- **npm package**: https://www.npmjs.com/package/@suro4ek/appmetrica-push-sdk
 
 ### Ручное создание Release
 
@@ -230,17 +230,17 @@ pnpm add @moseffect21/appmetrica-push-sdk
 
 ```bash
 # Просмотр информации о пакете
-npm view @moseffect21/appmetrica-push-sdk
+npm view @suro4ek/appmetrica-push-sdk
 
 # Просмотр версий пакета
-npm view @moseffect21/appmetrica-push-sdk versions --json
+npm view @suro4ek/appmetrica-push-sdk versions --json
 
 # Удаление пакета (в течение 24 часов после публикации)
-npm unpublish @moseffect21/appmetrica-push-sdk@1.0.0
+npm unpublish @suro4ek/appmetrica-push-sdk@1.0.0
 
 # Просмотр статистики загрузок
-npm view @moseffect21/appmetrica-push-sdk downloads
+npm view @suro4ek/appmetrica-push-sdk downloads
 
 # Просмотр GitHub релизов
-gh release list --repo moseffect21/appmetrica-push-sdk
+gh release list --repo suro4ek/appmetrica-push-sdk
 ```

@@ -27,7 +27,7 @@ if (Platform.OS === "ios") {
 ## Инициализация с APNS токеном
 
 ```typescript
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 await AppMetricaPush.initialize({
   debugMode: __DEV__,
@@ -40,7 +40,7 @@ await AppMetricaPush.initialize({
 ```typescript
 import { Platform } from "react-native";
 import { getAPNSToken, getMessaging } from "@react-native-firebase/messaging";
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 const initializeAppMetricaPush = async () => {
   try {

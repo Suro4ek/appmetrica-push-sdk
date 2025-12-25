@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Скрипт для публикации @moseffect21/appmetrica-push-sdk в npm
+# Скрипт для публикации @suro4ek/appmetrica-push-sdk в npm
 # Использование: ./scripts/publish.sh [patch|minor|major]
 
 set -e  # Остановить выполнение при ошибке
@@ -38,7 +38,7 @@ if [[ ! "$VERSION_TYPE" =~ ^(patch|minor|major)$ ]]; then
     exit 1
 fi
 
-log "🚀 Начинаем публикацию @moseffect21/appmetrica-push-sdk"
+log "🚀 Начинаем публикацию @suro4ek/appmetrica-push-sdk"
 log "Тип обновления версии: $VERSION_TYPE"
 
 # Проверка, что мы в правильной директории
@@ -50,8 +50,7 @@ fi
 # Проверка, что git репозиторий чистый
 if [[ -n $(git status --porcelain) ]]; then
     warning "Git репозиторий содержит несохраненные изменения."
-    read -p "Продолжить? (y/N): " -n 1 -r
-    echo
+    read -p "Продолжить? (y/N): " -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         log "Публикация отменена."
         exit 1
@@ -76,8 +75,7 @@ yarn install
 log "🔍 Проверка кода линтером..."
 if ! npm run lint; then
     warning "Линтер обнаружил предупреждения или ошибки."
-    read -p "Продолжить публикацию? (y/N): " -n 1 -r
-    echo
+    read -p "Продолжить публикацию? (y/N): " -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         log "Публикация отменена. Исправьте ошибки линтера."
         exit 1
@@ -122,12 +120,11 @@ fi
 # Подтверждение публикации
 echo
 warning "Готов к публикации:"
-echo "  Пакет: @moseffect21/appmetrica-push-sdk"
+echo "  Пакет: @suro4ek/appmetrica-push-sdk"
 echo "  Версия: $NEW_VERSION"
 echo "  Пользователь: $NPM_USER"
 echo
-read -p "Опубликовать пакет? (y/N): " -n 1 -r
-echo
+read -p "Опубликовать пакет? (y/N): " -r
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     log "Публикация отменена."
@@ -141,7 +138,7 @@ fi
 log "🚀 Публикация пакета в npm..."
 if npm publish --access public; then
     success "✅ Пакет успешно опубликован!"
-    success "📦 @moseffect21/appmetrica-push-sdk@$NEW_VERSION"
+    success "📦 @suro4ek/appmetrica-push-sdk@$NEW_VERSION"
     
     # Очистка временного файла
     rm -f "$PACKAGE_FILE"
@@ -164,14 +161,14 @@ if npm publish --access public; then
     success "🎉 Публикация завершена!"
     echo
     log "Пользователи могут установить пакет:"
-    echo "  npm install @moseffect21/appmetrica-push-sdk@$NEW_VERSION"
-    echo "  yarn add @moseffect21/appmetrica-push-sdk@$NEW_VERSION"
+    echo "  npm install @suro4ek/appmetrica-push-sdk@$NEW_VERSION"
+    echo "  yarn add @suro4ek/appmetrica-push-sdk@$NEW_VERSION"
     echo
     log "Проверить пакет:"
-    echo "  npm view @moseffect21/appmetrica-push-sdk"
+    echo "  npm view @suro4ek/appmetrica-push-sdk"
     echo
     log "GitHub Release:"
-    echo "  https://github.com/moseffect21/appmetrica-push-sdk/releases/tag/v$NEW_VERSION"
+    echo "  https://github.com/suro4ek/appmetrica-push-sdk/releases/tag/v$NEW_VERSION"
     
 else
     error "❌ Ошибка при публикации пакета"

@@ -1,4 +1,4 @@
-# @moseffect21/appmetrica-push-sdk
+# @suro4ek/appmetrica-push-sdk
 
 React Native библиотека для интеграции с Yandex AppMetrica Push SDK.
 
@@ -11,9 +11,9 @@ React Native библиотека для интеграции с Yandex AppMetri
 ## Установка
 
 ```bash
-npm install @moseffect21/appmetrica-push-sdk
+npm install @suro4ek/appmetrica-push-sdk
 # или
-yarn add @moseffect21/appmetrica-push-sdk
+yarn add @suro4ek/appmetrica-push-sdk
 ```
 
 ## Зависимости
@@ -64,7 +64,7 @@ cd ios && pod install
 import { Platform } from "react-native";
 import { getAPNSToken, getMessaging } from "@react-native-firebase/messaging";
 import { AppMetrica } from "@appmetrica/react-native-analytics";
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 // 1. Сначала активируем основную AppMetrica
 AppMetrica.activate({

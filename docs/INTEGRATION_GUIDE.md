@@ -13,7 +13,7 @@
 
 ## Обзор
 
-`@moseffect21/appmetrica-push-sdk` - это React Native библиотека для интеграции с Yandex AppMetrica Push SDK. Библиотека предоставляет единый API для работы с push-уведомлениями на iOS и Android.
+`@suro4ek/appmetrica-push-sdk` - это React Native библиотека для интеграции с Yandex AppMetrica Push SDK. Библиотека предоставляет единый API для работы с push-уведомлениями на iOS и Android.
 
 ### Основные возможности
 
@@ -29,13 +29,13 @@
 
 ```bash
 # Через npm
-npm install @moseffect21/appmetrica-push-sdk
+npm install @suro4ek/appmetrica-push-sdk
 
 # Через yarn
-yarn add @moseffect21/appmetrica-push-sdk
+yarn add @suro4ek/appmetrica-push-sdk
 
 # Через pnpm
-pnpm add @moseffect21/appmetrica-push-sdk
+pnpm add @suro4ek/appmetrica-push-sdk
 ```
 
 ### 2. Установка зависимостей
@@ -212,7 +212,7 @@ await AppMetricaPush.initialize({
 import { Platform } from "react-native";
 import { getAPNSToken, getMessaging } from "@react-native-firebase/messaging";
 import { AppMetrica } from "@appmetrica/react-native-analytics";
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 const initializeAppMetricaWithPush = async () => {
   try {
@@ -256,7 +256,7 @@ const initializeAppMetricaWithPush = async () => {
 
 ```typescript
 import messaging from "@react-native-firebase/messaging";
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 // Обработка уведомлений в foreground
 const unsubscribe = messaging().onMessage(async (remoteMessage) => {
@@ -301,7 +301,7 @@ messaging().onNotificationOpenedApp((remoteMessage) => {
 ```typescript
 import React from "react";
 import { View, Text } from "react-native";
-import { useAppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { useAppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 const MyComponent = () => {
   const { sdkInfo, isInitialized, isLoading } = useAppMetricaPush();
@@ -421,7 +421,7 @@ import { useEffect } from "react";
 import { Platform } from "react-native";
 import { getAPNSToken, getMessaging } from "@react-native-firebase/messaging";
 import { AppMetrica } from "@appmetrica/react-native-analytics";
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 export const useAppMetricaPushInit = () => {
   useEffect(() => {
@@ -474,7 +474,7 @@ export const useAppMetricaPushInit = () => {
 ### 2. Обработка уведомлений с навигацией
 
 ```typescript
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 import { NavigationContainerRef } from "@react-navigation/native";
 
 const handleNotificationPress = async (notification: any) => {
@@ -496,7 +496,7 @@ const handleNotificationPress = async (notification: any) => {
 ### 3. Отслеживание событий
 
 ```typescript
-import { AppMetricaPush } from "@moseffect21/appmetrica-push-sdk";
+import { AppMetricaPush } from "@suro4ek/appmetrica-push-sdk";
 
 const trackPushEvent = async (notification: any, action: string) => {
   const isFromAppMetrica = await AppMetricaPush.isNotificationFromAppMetrica(
@@ -532,8 +532,8 @@ const trackPushEvent = async (notification: any, action: string) => {
 
 ```bash
 # Переустановка
-npm uninstall @moseffect21/appmetrica-push-sdk
-npm install @moseffect21/appmetrica-push-sdk
+npm uninstall @suro4ek/appmetrica-push-sdk
+npm install @suro4ek/appmetrica-push-sdk
 
 # iOS
 cd ios && pod install
@@ -647,6 +647,6 @@ console.log("SDK Status:", { isInitialized, config, sdkInfo });
 
 ### Поддержка
 
-- **GitHub Issues:** [moseffect21/appmetrica-push-sdk](https://github.com/moseffect21/appmetrica-push-sdk/issues)
+- **GitHub Issues:** [suro4ek/appmetrica-push-sdk](https://github.com/suro4ek/appmetrica-push-sdk/issues)
 - **AppMetrica Docs:** [Push SDK Documentation](https://appmetrica.yandex.ru/docs/mobile-sdk-dg/push-sdk/about.html)
 - **Firebase Docs:** [React Native Firebase](https://rnfirebase.io/)

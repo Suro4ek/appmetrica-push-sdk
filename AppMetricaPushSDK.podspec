@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.authors      = package["author"]
 
   s.platforms    = { :ios => "11.0" }
-  s.source       = { :git => "https://github.com/moseffect21/appmetrica-push-sdk.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/suro4ek/appmetrica-push-sdk.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
   s.requires_arc = true

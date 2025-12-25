@@ -9,7 +9,7 @@ import io.appmetrica.analytics.push.AppMetricaPush
 /**
  * Receiver для обработки silent push уведомлений от AppMetrica
  * Настроен согласно документации AppMetrica Push SDK
- * Входит в состав библиотеки @moseffect21/appmetrica-push-sdk
+ * Входит в состав библиотеки @suro4ek/appmetrica-push-sdk
  */
 class SilentPushReceiver : BroadcastReceiver() {
     companion object {

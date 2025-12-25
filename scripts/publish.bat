@@ -1,13 +1,13 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Скрипт для публикации @moseffect21/appmetrica-push-sdk в npm (Windows)
+REM Скрипт для публикации @suro4ek/appmetrica-push-sdk в npm (Windows)
 REM Использование: scripts\publish.bat [patch|minor|major]
 
 set VERSION_TYPE=%1
 if "%VERSION_TYPE%"=="" set VERSION_TYPE=patch
 
-echo [INFO] 🚀 Начинаем публикацию @moseffect21/appmetrica-push-sdk
+echo [INFO] 🚀 Начинаем публикацию @suro4ek/appmetrica-push-sdk
 echo [INFO] Тип обновления версии: %VERSION_TYPE%
 
 REM Проверка, что мы в правильной директории
@@ -81,7 +81,7 @@ echo [SUCCESS] Архив создан: %PACKAGE_FILE%
 REM Подтверждение публикации
 echo.
 echo [WARNING] Готов к публикации:
-echo   Пакет: @moseffect21/appmetrica-push-sdk
+echo   Пакет: @suro4ek/appmetrica-push-sdk
 echo   Версия: %NEW_VERSION%
 echo   Пользователь: %NPM_USER%
 echo.
@@ -105,7 +105,7 @@ if errorlevel 1 (
 )
 
 echo [SUCCESS] ✅ Пакет успешно опубликован!
-echo [SUCCESS] 📦 @moseffect21/appmetrica-push-sdk@%NEW_VERSION%
+echo [SUCCESS] 📦 @suro4ek/appmetrica-push-sdk@%NEW_VERSION%
 
 REM Очистка временного файла
 del "%PACKAGE_FILE%" 2>nul
@@ -128,11 +128,11 @@ echo.
 echo [SUCCESS] 🎉 Публикация завершена!
 echo.
 echo [INFO] Пользователи могут установить пакет:
-echo   npm install @moseffect21/appmetrica-push-sdk@%NEW_VERSION%
-echo   yarn add @moseffect21/appmetrica-push-sdk@%NEW_VERSION%
+echo   npm install @suro4ek/appmetrica-push-sdk@%NEW_VERSION%
+echo   yarn add @suro4ek/appmetrica-push-sdk@%NEW_VERSION%
 echo.
 echo [INFO] Проверить пакет:
-echo   npm view @moseffect21/appmetrica-push-sdk
+echo   npm view @suro4ek/appmetrica-push-sdk
 echo.
 echo [INFO] GitHub Release:
-echo   https://github.com/moseffect21/appmetrica-push-sdk/releases/tag/v%NEW_VERSION%
+echo   https://github.com/suro4ek/appmetrica-push-sdk/releases/tag/v%NEW_VERSION%

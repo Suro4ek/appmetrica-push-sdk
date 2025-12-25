@@ -81,7 +81,7 @@ jobs:
 
             ### 🔗 Ссылки
             - [npm package](https://www.npmjs.com/package/${{ steps.package.outputs.name }})
-            - [GitHub repository](https://github.com/moseffect21/appmetrica-push-sdk)
+            - [GitHub repository](https://github.com/suro4ek/appmetrica-push-sdk)
           draft: false
           prerelease: false
           fail_on_unmatched_files: false
