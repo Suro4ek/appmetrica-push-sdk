@@ -1,6 +1,6 @@
 {
-  "name": "@moseffect21/appmetrica-push-sdk",
-  "version": "1.1.1",
+  "name": "@suro4ek/appmetrica-push-sdk",
+  "version": "1.0.2",
   "description": "React Native library for Yandex AppMetrica Push SDK",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -27,12 +27,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/moseffect21/appmetrica-push-sdk.git"
+    "url": "git+https://github.com/suro4ek/appmetrica-push-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/moseffect21/appmetrica-push-sdk/issues"
+    "url": "https://github.com/suro4ek/appmetrica-push-sdk/issues"
   },
-  "homepage": "https://github.com/moseffect21/appmetrica-push-sdk#readme",
+  "homepage": "https://github.com/suro4ek/appmetrica-push-sdk#readme",
   "devDependencies": {
     "@types/react": "^18.0.0",
     "@types/react-native": "^0.72.0",
