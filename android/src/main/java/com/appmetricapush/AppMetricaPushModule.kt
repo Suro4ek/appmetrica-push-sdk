@@ -32,20 +32,21 @@ class AppMetricaPushModule(reactContext: ReactApplicationContext) : ReactContext
         try {
             val debugMode = if (config.hasKey("debugMode")) config.getBoolean("debugMode") else false
 
-            // Инициализация AppMetrica Push
-            AppMetricaPush.activate(reactApplicationContext)
-            
+            // ВАЖНО: AppMetricaPush.activate() должен быть вызван в MainApplication.onCreate()
+            // Здесь мы только настраиваем канал уведомлений и проверяем статус
+            // Если activate() не был вызван в Application, SDK выбросит исключение при попытке использования
+
             // Настройка дефолтного канала AppMetrica Push SDK
             setupAppMetricaDefaultChannel()
-            
+
             if (debugMode) {
-                Log.d(TAG, "AppMetrica Push initialized successfully")
+                Log.d(TAG, "AppMetrica Push SDK ready (activated in MainApplication)")
             }
 
             promise.resolve(true)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize AppMetrica Push", e)
-            promise.reject("INIT_ERROR", e.message)
+            Log.e(TAG, "Failed to initialize AppMetrica Push. Make sure AppMetricaPush.activate() was called in MainApplication.onCreate()", e)
+            promise.reject("INIT_ERROR", "AppMetrica Push SDK is not activated. Add AppMetricaPush.activate(this) to MainApplication.onCreate()")
         }
     }
 
