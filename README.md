@@ -27,7 +27,25 @@ npm install @appmetrica/react-native-analytics
 
 ### Android
 
-Добавьте в `android/app/src/main/AndroidManifest.xml`:
+**1. Добавьте инициализацию в `MainApplication.kt`:**
+
+```kotlin
+import io.appmetrica.analytics.push.AppMetricaPush
+
+class MainApplication : Application(), ReactApplication {
+    override fun onCreate() {
+        super.onCreate()
+
+        // ВАЖНО: AppMetricaPush.activate() ДОЛЖЕН быть вызван в Application.onCreate()
+        // ДО инициализации React Native
+        AppMetricaPush.activate(this)
+
+        // ... остальной код
+    }
+}
+```
+
+**2. Добавьте в `android/app/src/main/AndroidManifest.xml`:**
 
 ```xml
 <application>
