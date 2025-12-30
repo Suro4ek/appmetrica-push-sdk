@@ -28,15 +28,12 @@ android {
 
 dependencies {
     implementation "com.facebook.react:react-native:+"
-
-    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.20"
 
-    // AppMetrica Push SDK
-    implementation("io.appmetrica.analytics:push:4.2.1")
-    implementation("io.appmetrica.analytics:push-provider-firebase:4.2.1")
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    // Изменить implementation на api, чтобы классы были доступны в основном приложении
+    api("io.appmetrica.analytics:push:4.2.1")
+    api("io.appmetrica.analytics:push-provider-firebase:4.2.1")
 
-    // Firebase - используем compileOnly, чтобы версии брались из основного проекта
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
     compileOnly 'com.google.firebase:firebase-messaging:24.0.0'
 }

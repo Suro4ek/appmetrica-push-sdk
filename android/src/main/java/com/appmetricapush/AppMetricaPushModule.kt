@@ -32,21 +32,20 @@ class AppMetricaPushModule(reactContext: ReactApplicationContext) : ReactContext
         try {
             val debugMode = if (config.hasKey("debugMode")) config.getBoolean("debugMode") else false
 
-            // ВАЖНО: AppMetricaPush.activate() должен быть вызван в MainApplication.onCreate()
-            // Здесь мы только настраиваем канал уведомлений и проверяем статус
-            // Если activate() не был вызван в Application, SDK выбросит исключение при попытке использования
-
+            // Инициализация AppMetrica Push
+            AppMetricaPush.activate(reactApplicationContext)
+            
             // Настройка дефолтного канала AppMetrica Push SDK
             setupAppMetricaDefaultChannel()
-
+            
             if (debugMode) {
-                Log.d(TAG, "AppMetrica Push SDK ready (activated in MainApplication)")
+                Log.d(TAG, "AppMetrica Push initialized successfully")
             }
 
             promise.resolve(true)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize AppMetrica Push. Make sure AppMetricaPush.activate() was called in MainApplication.onCreate()", e)
-            promise.reject("INIT_ERROR", "AppMetrica Push SDK is not activated. Add AppMetricaPush.activate(this) to MainApplication.onCreate()")
+            Log.e(TAG, "Failed to initialize AppMetrica Push", e)
+            promise.reject("INIT_ERROR", e.message)
         }
     }
 
@@ -79,18 +78,17 @@ class AppMetricaPushModule(reactContext: ReactApplicationContext) : ReactContext
     @ReactMethod
     fun isNotificationFromAppMetrica(notification: ReadableMap, promise: Promise) {
         try {
-            // Проверяем, что push уведомление не от AppMetrica
-            // Это нужно для собственных сервисов обработки push уведомлений
+            // Проверяем, что push уведомление от AppMetrica
+            // AppMetrica добавляет ключ "yamp" в data объект
             var isFromAppMetrica = false
-            
+
             if (notification.hasKey("data")) {
-                // Проверяем наличие специфических полей AppMetrica в данных
-                val data = notification.getString("data")
-                if (data != null && data.contains("appmetrica")) {
+                val data = notification.getMap("data")
+                if (data != null && data.hasKey("yamp")) {
                     isFromAppMetrica = true
                 }
             }
-            
+
             promise.resolve(isFromAppMetrica)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to check if notification is from AppMetrica", e)
