@@ -21,5 +21,4 @@ RCT_EXTERN_METHOD(registerDeviceToken:(NSString *)deviceToken
                   resolver:(RCTPromiseResolveBlock)resolver
                   rejecter:(RCTPromiseRejectBlock)rejecter)
 
-
 @end
