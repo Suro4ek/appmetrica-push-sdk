@@ -4,6 +4,9 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.appmetrica.analytics.push.provider.firebase.AppMetricaMessagingService
+import io.invertase.firebase.common.ReactNativeFirebaseEventEmitter
+import io.invertase.firebase.common.SharedUtils
+import io.invertase.firebase.messaging.ReactNativeFirebaseMessagingSerializer
 
 /**
  * Основной сервис для обработки Firebase Cloud Messaging
@@ -17,63 +20,52 @@ class FirebaseMessagingMainService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        
+
         Log.d(TAG, "Firebase message received: ${message.messageId}")
-        
+
         // Проверяем, что push уведомление от AppMetrica
         if (AppMetricaMessagingService.isNotificationRelatedToSDK(message)) {
             Log.d(TAG, "Processing AppMetrica push notification")
-            // AppMetrica Push SDK сам покажет уведомление пользователю
             AppMetricaMessagingService().processPush(this, message)
-            return
         }
 
-        // Обрабатываем собственные push уведомления
-        Log.d(TAG, "Processing custom push notification")
-        handleCustomPushMessage(message)
+        // Прокидываем ВСЕ сообщения в RN Firebase (для JS onMessage listener)
+        forwardToReactNativeFirebase(message)
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        
+
         Log.d(TAG, "New FCM token received: $token")
-        
+
         // Отправляем токен в AppMetrica Push SDK
         AppMetricaMessagingService().processToken(this, token)
-        
-        // Отправляем токен в другие SDK или обрабатываем самостоятельно
-        handleCustomToken(token)
-    }
 
-    /**
-     * Обработка собственных push уведомлений
-     */
-    private fun handleCustomPushMessage(message: RemoteMessage) {
+        // Прокидываем токен в RN Firebase
         try {
-            Log.d(TAG, "Custom push data: ${message.data}")
-            Log.d(TAG, "Custom push notification: ${message.notification}")
-            
-            // Здесь можно добавить логику обработки собственных push уведомлений
-            // Например, отправить событие в React Native через EventEmitter
-            
+            val emitter = ReactNativeFirebaseEventEmitter.getSharedInstance()
+            emitter.sendEvent(
+                ReactNativeFirebaseMessagingSerializer.newTokenToTokenEvent(token)
+            )
         } catch (e: Exception) {
-            Log.e(TAG, "Error handling custom push message", e)
+            Log.e(TAG, "Error forwarding token to RN Firebase", e)
         }
     }
 
-
     /**
-     * Обработка собственного токена
+     * Прокидывает сообщение в RN Firebase, чтобы JS onMessage listener сработал
      */
-    private fun handleCustomToken(token: String) {
+    private fun forwardToReactNativeFirebase(message: RemoteMessage) {
         try {
-            Log.d(TAG, "Handling custom token: $token")
-            
-            // Здесь можно отправить токен в другие SDK или на ваш сервер
-            // Например, отправить событие в React Native через EventEmitter
-            
+            if (SharedUtils.isAppInForeground(this)) {
+                val emitter = ReactNativeFirebaseEventEmitter.getSharedInstance()
+                emitter.sendEvent(
+                    ReactNativeFirebaseMessagingSerializer.remoteMessageToEvent(message, false)
+                )
+                Log.d(TAG, "Forwarded message to RN Firebase (foreground)")
+            }
         } catch (e: Exception) {
-            Log.e(TAG, "Error handling custom token", e)
+            Log.e(TAG, "Error forwarding to RN Firebase", e)
         }
     }
 }

@@ -68,10 +68,10 @@ class AppMetricaPushModule: NSObject, RCTBridgeModule {
             AppMetricaPush.handleApplicationDidFinishLaunching(options: nil)
             
             // 3. Настройка push-уведомлений
-            // self.setupPushNotifications(debugMode: debugMode)
+            self.setupPushNotifications(debugMode: debugMode)
             
-            // // 4. Настройка автоматической обработки push-уведомлений
-            // self.setupNotificationDelegate()
+            // 4. Настройка автоматической обработки push-уведомлений
+            self.setupNotificationDelegate()
             
             if debugMode {
                 print("AppMetrica Push SDK initialized successfully from TypeScript")
@@ -108,10 +108,20 @@ class AppMetricaPushModule: NSObject, RCTBridgeModule {
     /**
      * Настройка автоматической обработки push-уведомлений
      */
-    private func setupNotificationDelegate() {
-        let delegate = AppMetricaPush.userNotificationCenterDelegate
-        UNUserNotificationCenter.current().delegate = delegate
-    }
+    private func setupNotificationDelegate(debugMode: Bool = false) {                                                                                                                                     
+       let appMetricaDelegate = AppMetricaPush.userNotificationCenterDelegate                                                                                                                            
+                                                                                                                                                                                                          
+        // Сохраняем текущий делегат (Firebase) как следующий в цепочке                                                                                                                                   
+        let currentDelegate = UNUserNotificationCenter.current().delegate                                                                                                                                 
+        if let currentDelegate = currentDelegate {                                                                                                                                                        
+            appMetricaDelegate.nextDelegate = currentDelegate                                                                                                                                             
+            if debugMode {                                                                                                                                                                                
+               print("[Push] Chained delegate: AppMetrica → \(type(of: currentDelegate))")                                                                                                               
+            }                                                                                                                                                                                             
+        }                                                                                                                                                                                                 
+                                                                                                                                                                                                          
+       UNUserNotificationCenter.current().delegate = appMetricaDelegate                                                                                                                                  
+    }            
     
     
     // MARK: - Notification Analysis
