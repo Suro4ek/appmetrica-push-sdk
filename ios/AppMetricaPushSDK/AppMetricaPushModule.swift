@@ -68,10 +68,10 @@ class AppMetricaPushModule: NSObject, RCTBridgeModule {
             AppMetricaPush.handleApplicationDidFinishLaunching(options: nil)
             
             // 3. Настройка push-уведомлений
-            self.setupPushNotifications(debugMode: debugMode)
+            // self.setupPushNotifications(debugMode: debugMode)
             
-            // 4. Настройка автоматической обработки push-уведомлений
-            self.setupNotificationDelegate()
+            // // 4. Настройка автоматической обработки push-уведомлений
+            // self.setupNotificationDelegate()
             
             if debugMode {
                 print("AppMetrica Push SDK initialized successfully from TypeScript")
