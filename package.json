@@ -1,6 +1,6 @@
 {
   "name": "@suro4ek/appmetrica-push-sdk",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "React Native library for Yandex AppMetrica Push SDK",
   "main": "src/index.ts",
   "types": "src/index.ts",
