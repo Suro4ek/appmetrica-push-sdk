@@ -73,6 +73,33 @@ class AppMetricaPush {
   }
 
   /**
+   * Получение уведомления, которое запустило приложение из killed state.
+   * Вызывать после подписки на события (addListener).
+   * Возвращает null если приложение было запущено не из пуша.
+   */
+  async getInitialNotification(): Promise<{
+    title: string;
+    body: string;
+    deepLink?: string;
+    userData?: any;
+  } | null> {
+    try {
+      if (!AppMetricaPushModule) {
+        return null;
+      }
+
+      if (Platform.OS !== "ios") {
+        return null;
+      }
+
+      return await AppMetricaPushModule.getInitialNotification();
+    } catch (error) {
+      console.error("Failed to get initial notification:", error);
+      return null;
+    }
+  }
+
+  /**
    * Проверка, что уведомление от AppMetrica
    * Используется в собственных сервисах обработки push уведомлений
    */

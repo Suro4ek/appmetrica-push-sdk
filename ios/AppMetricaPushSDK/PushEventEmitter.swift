@@ -5,6 +5,10 @@ import React
 class PushEventEmitter: RCTEventEmitter {
     static var shared: PushEventEmitter?
 
+    /// Tracks whether JS has active listeners.
+    /// Used by ForegroundNotificationDelegate to decide: send directly or buffer.
+    private(set) var hasActiveListeners = false
+
     override init() {
         super.init()
         PushEventEmitter.shared = self
@@ -22,6 +26,16 @@ class PushEventEmitter: RCTEventEmitter {
         return ["onPushReceived", "onPushOpened"]
     }
 
-    override func startObserving() {}
-    override func stopObserving() {}
+    /// Called by RN when JS subscribes via addListener — JS is ready to receive events.
+    override func startObserving() {
+        hasActiveListeners = true
+        // Flush notification that was buffered during cold start
+        DispatchQueue.main.async {
+            ForegroundNotificationDelegate.shared.flushPendingNotifications()
+        }
+    }
+
+    override func stopObserving() {
+        hasActiveListeners = false
+    }
 }

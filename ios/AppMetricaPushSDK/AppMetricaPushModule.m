@@ -6,6 +6,9 @@ RCT_EXTERN_METHOD(initialize:(NSDictionary *)config
                   resolver:(RCTPromiseResolveBlock)resolver
                   rejecter:(RCTPromiseRejectBlock)rejecter)
 
+RCT_EXTERN_METHOD(getInitialNotification:(RCTPromiseResolveBlock)resolver
+                  rejecter:(RCTPromiseRejectBlock)rejecter)
+
 RCT_EXTERN_METHOD(isNotificationFromAppMetrica:(NSDictionary *)notification
                   resolver:(RCTPromiseResolveBlock)resolver
                   rejecter:(RCTPromiseRejectBlock)rejecter)

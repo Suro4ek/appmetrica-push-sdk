@@ -76,6 +76,21 @@ export const getUserDataFromNotification = async (notification: any) => {
 };
 
 /**
+ * Получение уведомления, которое запустило приложение из killed state (iOS).
+ * Вызывать после инициализации и подписки на события.
+ * Возвращает null если приложение было запущено не из пуша.
+ */
+export const getInitialNotification = async () => {
+  const instance = AppMetricaPush.getInstance();
+  try {
+    return await instance.getInitialNotification();
+  } catch (error) {
+    console.error("Failed to get initial notification:", error);
+    return null;
+  }
+};
+
+/**
  * Проверка инициализации SDK
  */
 export const isSDKInitialized = (): boolean => {

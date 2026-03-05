@@ -11,6 +11,7 @@ export {
   isNotificationFromAppMetrica,
   getPushSDKInfo,
   getUserDataFromNotification,
+  getInitialNotification,
   registerDeviceToken,
   isSDKInitialized,
   getCurrentConfig,
